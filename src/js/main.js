@@ -63,7 +63,7 @@ var SupportKit = Marionette.Object.extend({
 
     init: function(options) {
         if (this.ready) {
-            return;
+            this.logout();
         }
 
         // TODO: alternatively load fallback CSS that doesn't use
@@ -78,7 +78,9 @@ var SupportKit = Marionette.Object.extend({
         options = options || {};
 
         options = _.defaults(options, {
-            emailCaptureEnabled: false
+            emailCaptureEnabled: false,
+            embeddedMode: false,
+            renderOnInit: true
         });
 
         if (typeof options === 'object') {
@@ -93,6 +95,14 @@ var SupportKit = Marionette.Object.extend({
         if (!endpoint.appToken) {
             throw new Error('init method requires an appToken');
         }
+
+        if (options.embeddedMode && options.renderOnInit && !options.container) {
+            throw new Error('A container should be provided if the widget is in embedded mode');
+        }
+
+        this.isEmbedded = options.embeddedMode;
+        this.container = $(options.container);
+        this.renderOnInit = options.renderOnInit;
 
         var uiText = _.extend({}, this.defaultText, options.customText);
 
@@ -143,14 +153,16 @@ var SupportKit = Marionette.Object.extend({
                 // if the email was passed at init, it can't be changed through the web widget UI
                 var readOnlyEmail = !_.isEmpty(options.email);
 
-                var emailCaptureEnabled = options.emailCaptureEnabled && !readOnlyEmail
+                var emailCaptureEnabled = options.emailCaptureEnabled && !readOnlyEmail;
+
 
                 this._chatController = new ChatController({
                     collection: this._conversations,
                     user: this.user,
                     readOnlyEmail: readOnlyEmail,
                     emailCaptureEnabled: emailCaptureEnabled,
-                    uiText: uiText
+                    uiText: uiText,
+                    isEmbedded: this.isEmbedded
                 });
 
                 return this.user.save(_.pick(options, AppUser.EDITABLE_PROPERTIES), {
@@ -159,7 +171,12 @@ var SupportKit = Marionette.Object.extend({
                 });
             }).bind(this))
             .then(_(function() {
-                this._renderWidget();
+                if (this.renderOnInit) {
+                    var container = this.isEmbedded ? this.container : $('body');
+                    return this.renderWidget(container);
+                } else {
+                    this.triggerMethod('ready');
+                }
             }).bind(this))
             .fail(function(err) {
                 var message = err && (err.message || err.statusText);
@@ -171,6 +188,7 @@ var SupportKit = Marionette.Object.extend({
     },
 
     logout: function() {
+        this._readyPromise = $.Deferred();
         this.destroy();
     },
 
@@ -211,8 +229,6 @@ var SupportKit = Marionette.Object.extend({
     },
 
     updateUser: function(userInfo) {
-        var userChanged = false;
-
         if (typeof userInfo !== 'object') {
             return $.Deferred().reject(new Error('updateUser accepts an object as parameter'));
         }
@@ -279,19 +295,16 @@ var SupportKit = Marionette.Object.extend({
         }
     },
 
-    _renderWidget: function() {
-        this._chatController.getWidget().then(_.bind(function(widget) {
-            $('body').append(widget.el);
-
+    renderWidget: function(container) {
+        return this._chatController.getWidget().then(_.bind(function(widget) {
+            container.append(widget.el);
 
             _(function() {
                 this._chatController.scrollToBottom();
             }).chain().bind(this).delay();
 
-            // Tell the world we're ready
             this.triggerMethod('ready');
         }, this));
-
     },
 
     onReady: function() {

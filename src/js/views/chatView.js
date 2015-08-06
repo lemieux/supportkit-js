@@ -7,7 +7,9 @@ module.exports = Marionette.LayoutView.extend({
 
     template: template,
 
-    className: 'sk-noanimation sk-close',
+    className: function() {
+        return 'sk-noanimation sk-close' + (this.getOption('isEmbedded') ? ' sk-embedded' : '');
+    },
 
     triggers: {
         'focus @ui.wrapper': 'focus'

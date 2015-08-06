@@ -28,6 +28,12 @@ module.exports = ViewController.extend({
         focus: 'resetUnread'
     },
 
+    viewOptions: function() {
+        return {
+            isEmbedded: this.getOption('isEmbedded')
+        };
+    },
+
     initialize: function() {
         bindAll(this);
         this.isOpened = false;
@@ -323,7 +329,10 @@ module.exports = ViewController.extend({
     _renderWidget: function(conversation) {
         this.model = conversation;
 
-        this._renderChatHeader();
+        if (!this.getOption('isEmbedded')) {
+            this._renderChatHeader();
+        }
+
         this._renderConversation();
         this._renderConversationInput();
     },
