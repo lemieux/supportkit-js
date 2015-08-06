@@ -166,6 +166,46 @@ SupportKit.on('destroy', function(){
 SupportKit.destroy();
 ```
 
+### Embedded mode
+You might want to embed SupportKit directly into your app instead of having a widget. To do this you need to enable it on init:
+
+```javascript
+var skInit = SupportKit.init({
+    appToken: 'your_app_token',
+    givenName: 'Cool',
+    surname: 'Person',
+    email: 'their_email@whatever.com',
+    // For secure mode
+    jwt: 'your_jwt',
+    userId: 'user_id',
+    // Additional properties
+    properties: {
+        'anything': 'whatever_you_want'    
+    },
+
+    embeddedMode: true,
+    container: $('.some-container')
+});
+
+
+skInit.then(function(){
+    SupportKit.renderWidget($('#chat-container'));
+});
+```
+
+If you are building a static page where the container is always there, you can pass the element as the `container` options in init. 
+
+If you are building a single page app, or any app that might cause the container to be render and removed without reloading the page, you might consider passing `renderOnInit: false` in the options to avoid render it immediately. Later, you can call `SupportKit.renderWidget(container)` which will reattach the widget to that container.
+
+You might want to keep the promise returned on `init` around and render in the promise chain, so you know the sdk is properly initialize before rendering it.
+
+### Single page app considerations
+You might want to initialize the SDK right after login/page load and keep a reference somewhere so that whenever you want to render it, the load time is minimal. 
+
+Also, don't forget to call `SupportKit.logout()` when logging your user out, especially if you don't have a page reload on login or logout. This will make sure to wipe all data from the conversation of the previous user.
+
+If you are using the CDN version, you might want to use a script loader like `scriptjs` to make sure SupportKit is loaded in the page before using it.
+
 ## How to contribute
 
 ### Clone the git repo
