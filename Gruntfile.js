@@ -68,7 +68,7 @@ module.exports = function(grunt) {
 
         watch: {
             dev: {
-                files: ['src/js/**/*.js', '*.html', 'src/templates/*.tpl', 'src/stylesheets/*.less', 'config/config.json', 'example/template/*'],
+                files: ['src/js/**/*.js', 'src/js/**/*.jsx', '*.html', 'src/templates/*.tpl', 'src/stylesheets/*.less', 'config/config.json', 'example/template/*'],
                 tasks: ['devbuild'],
                 options: {
                     spawn: false,
@@ -151,9 +151,6 @@ module.exports = function(grunt) {
             options: {
                 browserifyOptions: {
                     debug: true,
-                    'transform': [
-                        'browserify-shim'
-                    ],
                     standalone: 'SupportKit'
                 }
             }
