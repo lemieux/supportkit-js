@@ -2,6 +2,8 @@ import urljoin from 'urljoin';
 import { call } from '../utils/WebAPIUtils';
 import { initFaye } from '../utils/FayeUtils';
 
+import AppStore from '../stores/AppStore';
+import ConversationStore from '../stores/ConversationStore';
 import ConversationActions from '../actions/ConversationActions';
 
 var setConversation = (conversation) => {
@@ -15,7 +17,7 @@ var setConversation = (conversation) => {
 
 
 class ConversationService {
-    getConversation(props) {
+    getConversation() {
         return call({
             url: 'conversations',
             method: 'GET'
@@ -27,7 +29,7 @@ class ConversationService {
         });
     }
 
-    createConversation(props) {
+    createConversation() {
         return call({
             url: 'conversations',
             method: 'POST'
@@ -35,19 +37,30 @@ class ConversationService {
     }
 
     sendMessage(props) {
-        return call({
-            url: urljoin('conversations', props.conversationId, 'messages'),
-            method: 'POST',
-            data: props.message
-        }).then((message) => {
-            ConversationActions.addMessage({
-                message: message
+        let promise = ConversationStore.conversationId
+            ? Promise.resolve()
+            : this.createConversation();
+
+        promise.then(() => {
+            return call({
+                url: urljoin('conversations', ConversationStore.conversationId, 'messages'),
+                method: 'POST',
+                data: {
+                    text: props.text,
+                    authorId: AppStore.appUserId
+                }
+            }).then((message) => {
+                ConversationActions.addMessage({
+                    message: message
+                })
             })
         });
+
+        return promise;
     }
 
-    connect(props) {
-        return initFaye(props.conversationId)
+    connect() {
+        return initFaye(ConversationStore.conversationId)
             .then((client) => {
                 ConversationActions.setClient({
                     client: client

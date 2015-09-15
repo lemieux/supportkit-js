@@ -5,11 +5,29 @@ import ChatInput from './ChatInput.jsx';
 
 export default class ChatWindow extends Component {
 
+    constructor() {
+        super();
+
+        this.state = {
+            isOpened: false
+        };
+
+        this.toggle = this.toggle.bind(this);
+    }
+
+    toggle(e) {
+        e.preventDefault();
+
+        this.setState({
+            isOpened: !this.state.isOpened
+        });
+    }
+
     render() {
         return (
-            <div id="sk-container" className="sk-appear">
+            <div id="sk-container" className={this.state.isOpened ? 'sk-appear' : 'sk-close'}>
                 <div id="sk-wrapper">
-                    <Header/>
+                    <Header isOpened={this.state.isOpened} onClick={this.toggle}/>
                     <Conversation/>
                     <ChatInput/>
                 </div>
