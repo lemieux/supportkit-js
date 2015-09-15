@@ -1,7 +1,7 @@
-import { SET_CONFIG } from '../constants/AppConstants';
-import BaseStore from './BaseStore';
+import _ from 'underscore';
 
-var ROOT_URL = 'https://sdk.supportkit.io';
+import { SET_CONFIG, UNSET_CONFIG, DEFAULT_UI_TEXT, ROOT_URL } from '../constants/AppConstants';
+import BaseStore from './BaseStore';
 
 class AppStore extends BaseStore {
 
@@ -9,9 +9,9 @@ class AppStore extends BaseStore {
         super();
         this.subscribe(() => this._registerToActions.bind(this));
         this._rootUrl = ROOT_URL;
-        this._appToken = undefined;
-        this._jwt = undefined;
-        this._appUserId = undefined;
+        this._appToken = null;
+        this._jwt = null;
+        this._appUserId = null;
     }
 
     _registerToActions(action) {
@@ -21,7 +21,15 @@ class AppStore extends BaseStore {
             this._appToken = action.config.appToken || this._appToken;
             this._jwt = action.config.jwt || this._jwt;
             this._appUserId = action.config.appUserId || this._appUserId;
+            this._uiText = _.extend({}, DEFAULT_UI_TEXT, action.config.customText);
             this.emitChange();
+            break;
+        case UNSET_CONFIG:
+            this._rootUrl = ROOT_URL;
+            this._appToken = null;
+            this._jwt = null;
+            this._appUserId = null;
+            this._uiText = DEFAULT_UI_TEXT;
             break;
         default:
             break;
@@ -42,6 +50,10 @@ class AppStore extends BaseStore {
 
     get appUserId() {
         return this._appUserId;
+    }
+
+    get uiText() {
+        return this._uiText;
     }
 }
 

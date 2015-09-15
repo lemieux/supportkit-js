@@ -1,5 +1,11 @@
 import React, { Component } from 'react';
 
+import AppStore from '../stores/AppStore';
+import ConnectToStores from './ConnectToStores.jsx';
+
+@ConnectToStores([AppStore], props => ({
+    uiText: AppStore.uiText
+}))
 export default class Header extends Component {
 
     render() {
@@ -7,6 +13,7 @@ export default class Header extends Component {
             <div id="sk-header" className="">
                 <div id="sk-notification-badge"><i className="fa fa-gear"></i></div>
                 <div className="sk-close-handle sk-close-hidden"><i className="fa fa-times"></i></div>
+                { this.props.uiText.headerText }
             </div>
         );
     }
