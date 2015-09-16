@@ -9,7 +9,7 @@ export default (stores, getState) => {
           'Component';
 
         return class StoreConnector extends Component {
-            static displayName = 'connectToStores(${displayName})';
+            static displayName = 'connectToStores('+ displayName +')';
 
             constructor(props) {
                 super(props);

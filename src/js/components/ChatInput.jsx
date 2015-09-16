@@ -12,6 +12,7 @@ import ConversationService from '../services/ConversationService';
 }))
 @mixin.decorate(React.addons.LinkedStateMixin)
 export default class ChatInput extends Component {
+    static displayName = 'ChatInput'
 
     constructor() {
         super();

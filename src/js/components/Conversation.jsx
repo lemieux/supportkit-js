@@ -5,13 +5,21 @@ import ConversationStore from '../stores/ConversationStore';
 import AppStore from '../stores/AppStore';
 import ConnectToStores from './ConnectToStores.jsx';
 
-import { createMarkup } from '../utils/HTMLUtils';
+import { createMarkup, autolink } from '../utils/HTMLUtils';
 
 @ConnectToStores([AppStore], props => ({
     rootUrl: AppStore.rootUrl
 }))
 export class Message extends Component {
     render() {
+        let actions = this.props.actions.map((action) => {
+            return (
+                <div key={ action._id } className="sk-action">
+                    <a className="btn btn-sk-primary" href={ action.uri } target="_blank">{action.text}</a>
+                </div>
+            );
+        });
+
         let avatar = null;
         if(this.props.isAppMaker) {
             let avatarUrl =
@@ -20,10 +28,13 @@ export class Message extends Component {
             avatar = <img className="sk-msg-avatar" src={ avatarUrl } />;
         }
 
-        let text = this.props.text.split('\n').length === 1
-            ? this. props.text
-            : this.props.text.split('\n').map((item, index) => {
-              return (<span key={index}>{item}<br/></span>);
+        let text = this.props.text.split('\n').map((item, index) => {
+              return (
+                    <span key={index}>
+                        <span dangerouslySetInnerHTML={createMarkup(autolink(item, {target: '_blank'}))}></span>
+                        <br/>
+                    </span>
+                );
             });
 
         return (
@@ -31,7 +42,10 @@ export class Message extends Component {
                 { avatar }
                 <div className="sk-msg-wrapper">
                     <div className="sk-from">{ this.props.isAppMaker ? this.props.name : '' }</div>
-                    <div className="sk-msg"> { text }</div>
+                    <div className="sk-msg">
+                        { text }
+                        { actions }
+                    </div>
                 </div>
                 <div className="sk-clear"></div>
             </div>
