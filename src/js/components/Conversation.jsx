@@ -29,7 +29,11 @@ export class Message extends Component {
         }
 
         let text = this.props.text.split('\n').map((item, index) => {
-              return (
+                if(!item.trim()){
+                    return;
+                }
+
+                return (
                     <span key={index}>
                         <span dangerouslySetInnerHTML={createMarkup(autolink(item, {target: '_blank'}))}></span>
                         <br/>

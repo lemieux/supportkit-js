@@ -9,9 +9,9 @@ import ConversationActions from '../actions/ConversationActions';
 var setConversation = (conversation) => {
     ConversationActions.setConversation({
         conversationId: conversation._id,
-        messages: conversation.messages,
-        appMakers: conversation.appMakers,
-        appUsers: conversation.appUsers
+        messages: conversation.messages || [],
+        appMakers: conversation.appMakers || [],
+        appUsers: conversation.appUsers || []
     });
 };
 

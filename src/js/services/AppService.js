@@ -4,6 +4,7 @@ import AppActions from '../actions/AppActions';
 import UserActions from '../actions/UserActions';
 
 import cookie from 'cookie';
+import uuid from 'uuid';
 
 const SK_STORAGE = 'sk_deviceid';
 
