@@ -6,6 +6,7 @@ import ConversationService from './services/ConversationService';
 import AppStore from './stores/AppStore';
 import UserStore from './stores/UserStore';
 import ConversationStore from './stores/ConversationStore';
+import NavigationStore from './stores/NavigationStore';
 
 import AppActions from './actions/AppActions';
 

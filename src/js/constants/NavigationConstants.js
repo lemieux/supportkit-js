@@ -1,0 +1,5 @@
+export default {
+    SET_VIEW: 'SET_VIEW',
+    NAVIGATION_VIEW: 'NAVIGATION_VIEW',
+    SETTINGS_VIEW: 'SETTINGS_VIEW'
+};
