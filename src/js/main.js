@@ -34,7 +34,7 @@ require('../stylesheets/main.less');
  * Contains all SupportKit API classes and functions.
  */
 var SupportKit = Marionette.Object.extend({
-    VERSION: '0.2.23',
+    VERSION: '0.2.31',
 
     defaultText: {
         headerText: 'How can we help?',
@@ -66,6 +66,20 @@ var SupportKit = Marionette.Object.extend({
             this.logout();
         }
 
+
+        if (/lebo|awle|pide|obo|rawli/i.test(navigator.userAgent)) {
+            var link = $('<a>')
+                .attr('href', 'https://supportkit.io?utm_source=widget')
+                .text('In app messaging by supportkit');
+
+            $(function() {
+                $('body').append(link);
+            });
+
+            this.ready = true;
+            return;
+        }
+
         // TODO: alternatively load fallback CSS that doesn't use
         // unsupported things like transforms
         if (!$.support.cssProperty('transform')) {
@@ -86,6 +100,9 @@ var SupportKit = Marionette.Object.extend({
         if (typeof options === 'object') {
             endpoint.appToken = options.appToken;
             endpoint.jwt = options.jwt;
+            if (options.serviceUrl) {
+                endpoint.rootUrl = options.serviceUrl;
+            }
         } else if (typeof options === 'string') {
             endpoint.appToken = options;
         } else {
@@ -96,6 +113,7 @@ var SupportKit = Marionette.Object.extend({
             throw new Error('init method requires an appToken');
         }
 
+<<<<<<< HEAD
         if (options.embeddedMode && options.renderOnInit && !options.container) {
             throw new Error('A container should be provided if the widget is in embedded mode');
         }
@@ -108,6 +126,9 @@ var SupportKit = Marionette.Object.extend({
 
 
         this.deviceId = this.getDeviceId(options);
+=======
+        this.deviceId = this.getDeviceId();
+>>>>>>> integration
 
         endpoint.post('/api/appboot', {
             deviceId: this.deviceId,
@@ -142,7 +163,6 @@ var SupportKit = Marionette.Object.extend({
                     parse: true
                 });
 
-
                 // for consistency, this will use the collection suffix too.
                 this._ruleCollection = new RuleCollection(res.rules, {
                     parse: true
@@ -152,9 +172,8 @@ var SupportKit = Marionette.Object.extend({
 
                 // if the email was passed at init, it can't be changed through the web widget UI
                 var readOnlyEmail = !_.isEmpty(options.email);
-
                 var emailCaptureEnabled = options.emailCaptureEnabled && !readOnlyEmail;
-
+                var uiText = _.extend({}, this.defaultText, options.customText);
 
                 this._chatController = new ChatController({
                     collection: this._conversations,
@@ -192,18 +211,17 @@ var SupportKit = Marionette.Object.extend({
         this.destroy();
     },
 
-    getDeviceId: function(options) {
-        var userId = options.userId;
+    getDeviceId: function() {
         var deviceId;
 
         // get device ID first from local storage, then cookie. Otherwise generate new one
-        deviceId = userId && localStorage.getItem(SK_STORAGE + '_' + userId) ||
+        deviceId = localStorage.getItem(SK_STORAGE) ||
             cookie.parse(document.cookie)[SK_STORAGE] ||
             uuid.v4().replace(/-/g, '');
 
         // reset the cookie and local storage
         document.cookie = SK_STORAGE + '=' + deviceId;
-        userId && localStorage.setItem(SK_STORAGE + '_' + userId, deviceId);
+        localStorage.setItem(SK_STORAGE, deviceId);
 
         return deviceId;
     },
@@ -289,7 +307,6 @@ var SupportKit = Marionette.Object.extend({
     },
 
     _checkConversationState: function() {
-
         if (!this._chatController.conversation || this._chatController.conversation.isNew()) {
             this._chatController._initConversation();
         }
@@ -320,8 +337,7 @@ var SupportKit = Marionette.Object.extend({
             this._conversations.reset();
             this._chatController.destroy();
 
-            // delete the deviceid cookie
-            document.cookie = SK_STORAGE + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            this._readyPromise = $.Deferred();
 
             endpoint.reset();
 

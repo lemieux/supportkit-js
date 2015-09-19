@@ -39,7 +39,6 @@ module.exports = ViewController.extend({
         this.isOpened = false;
         this.user = this.getOption('user');
         this.uiText = this.getOption('uiText') || {};
-
         this.conversationInitiated = false;
     },
 
@@ -69,53 +68,51 @@ module.exports = ViewController.extend({
     },
 
     sendMessage: function(text) {
-        var conversationDeferred = $.Deferred();
-        var messageDeferred = $.Deferred();
+        return $.Deferred().resolve().then(function() {
+            var promise = $.Deferred();
 
-        if (this.conversation.isNew()) {
-            this.conversation = this.collection.create(this.conversation, {
-                success: conversationDeferred.resolve,
-                error: conversationDeferred.reject
+            if (this.conversation.isNew()) {
+                this.conversation = this.collection.create(this.conversation, {
+                    success: promise.resolve,
+                    error: promise.reject
+                });
+            } else {
+                promise.resolve(this.conversation);
+            }
+
+            return promise;
+        }.bind(this))
+            .then(this._initFaye)
+            .then(function(conversation) {
+                // update the user before sending the message to ensure properties are correct
+                return this.user._save({}, {
+                    wait: true
+                }).then(_.constant(conversation));
+            }.bind(this)).then(function(conversation) {
+            var promise = $.Deferred();
+
+            conversation.get('messages').create({
+                authorId: endpoint.appUserId,
+                text: text
+            }, {
+                success: promise.resolve,
+                error: promise.reject
             });
 
-            conversationDeferred.then(this._initFaye);
-        } else {
-            conversationDeferred.resolve(this.conversation);
-        }
+            return promise;
+        }.bind(this)).then(function(message) {
+            var appUserMessages = this.conversation.get('messages').filter(function(message) {
+                return message.get('authorId') === endpoint.appUserId;
+            });
 
+            if (this.getOption('emailCaptureEnabled') &&
+                appUserMessages.length === 1 &&
+                !this.user.get('email')) {
+                this._showEmailNotification();
+            }
 
-        conversationDeferred.then(_.bind(function(conversation) {
-            // update the user before sending the message to ensure properties are correct
-            this.user._save({}, {
-                wait: true
-            }).then(function() {
-                conversation.get('messages').create({
-                    authorId: endpoint.appUserId,
-                    text: text
-                }, {
-                    success: messageDeferred.resolve,
-                    error: messageDeferred.reject
-                });
-            }.bind(this))
-                .fail(messageDeferred.reject);
-
-
-            messageDeferred.then(_.bind(function(message) {
-                var appUserMessages = this.conversation.get('messages').filter(function(message) {
-                    return message.get('authorId') === endpoint.appUserId;
-                });
-
-                if (this.getOption('emailCaptureEnabled') &&
-                    appUserMessages.length === 1 &&
-                    !this.user.get('email')) {
-                    this._showEmailNotification();
-                }
-
-                return message;
-            }, this));
-        }, this));
-
-        return messageDeferred;
+            return message;
+        }.bind(this));
     },
 
     scrollToBottom: function() {
@@ -199,10 +196,10 @@ module.exports = ViewController.extend({
 
     _initFaye: function(conversation) {
         if (!conversation.isNew()) {
-            return faye.init(conversation.id).then(_.bind(function(client) {
+            return faye.init(conversation.id).then(function(client) {
                 this._fayeClient = client;
                 return conversation;
-            }, this));
+            }.bind(this));
         }
 
         return $.Deferred().resolve(conversation);
@@ -290,6 +287,9 @@ module.exports = ViewController.extend({
             }
         });
 
+
+        this.listenToOnce(settingsController, 'settings:close', this._hideSettings);
+
         this.listenToOnce(settingsController, 'destroy', function() {
             this.stopListening(settingsController);
         });
@@ -308,7 +308,6 @@ module.exports = ViewController.extend({
         });
 
         this.getView().main.show(this.conversationView);
-
     },
 
     _renderConversationInput: function() {
@@ -364,7 +363,6 @@ module.exports = ViewController.extend({
                 return view;
             });
     },
-
 
     _getLatestReadTime: function() {
         if (!this.latestReadTs) {
