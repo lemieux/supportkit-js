@@ -113,7 +113,6 @@ var SupportKit = Marionette.Object.extend({
             throw new Error('init method requires an appToken');
         }
 
-<<<<<<< HEAD
         if (options.embeddedMode && options.renderOnInit && !options.container) {
             throw new Error('A container should be provided if the widget is in embedded mode');
         }
@@ -125,10 +124,7 @@ var SupportKit = Marionette.Object.extend({
         var uiText = _.extend({}, this.defaultText, options.customText);
 
 
-        this.deviceId = this.getDeviceId(options);
-=======
         this.deviceId = this.getDeviceId();
->>>>>>> integration
 
         endpoint.post('/api/appboot', {
             deviceId: this.deviceId,
