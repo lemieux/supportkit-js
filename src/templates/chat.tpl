@@ -1,3 +1,4 @@
+<div id="sk-bubble-overlay"></div>
 <div id="sk-wrapper">
     <div data-region-header class="sk-noselect"></div>
     <div data-region-notifications class="sk-notifications">

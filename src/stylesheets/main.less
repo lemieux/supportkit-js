@@ -5,10 +5,8 @@
 #sk-container {
     position: fixed;
     bottom: 0;
-    right: 10px;
+    right: 0;
     margin-bottom: -1px;
-    box-shadow: 0 0 24px rgba(0,0,0,0.15);
-    border: 1px solid rgba(0,0,0,0.15);
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-weight: 400;
     font-size: 13px;
@@ -16,7 +14,6 @@
     border-radius: 10px 10px 0 0;
     text-rendering: optimizeLegibility;
     color: #333;
-    .translate(0, 90%);
     z-index: 2147483647;
 
     text-rendering: optimizeLegibility;
@@ -32,8 +29,44 @@
         background: @background-color;
         width: @widget-width;
         height: @widget-height;
-        position: relative;
         border-radius: 10px 10px 0 0;
+        box-shadow: 0 0 24px rgba(0,0,0,0.15);
+        border: 1px solid rgba(0,0,0,0.15);
+        position: fixed;
+        right: 10px;
+        bottom: 0px;
+        .transition(all 0.2s ease-in-out);
+        .scale(1);
+    }
+
+    #sk-bubble-overlay {
+      display: none;
+      box-shadow: 0 0 24px rgba(0,0,0,0.15);
+      border: 1px solid rgba(0,0,0,0.15);
+      position: fixed;
+      right: 35px;
+      bottom: 35px;
+    }
+
+    &.sk-close {
+
+      #sk-wrapper {
+        .scale(0);
+      }
+
+      #sk-bubble-overlay {
+        display: block;
+        background-image: data-uri('src/images/smooch_symbol_rgb.png');
+        background-color: white;
+        cursor:pointer;
+        .square(75px);
+        .border-top-radius(50%);
+        .border-bottom-radius(50%);
+        background-repeat: no-repeat;
+        background-size: 60px;
+        background-position: 7px 15px;
+      }
+
     }
 
     @media (max-width: @screen-sm-min) {
@@ -43,7 +76,7 @@
 
         &.sk-appear {
             &, #sk-wrapper {
-                height: 100%;                
+                height: 100%;
             }
         }
 

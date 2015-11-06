@@ -10,7 +10,8 @@ module.exports = Marionette.LayoutView.extend({
     className: 'sk-noanimation sk-close',
 
     triggers: {
-        'focus @ui.wrapper': 'focus'
+        'focus @ui.wrapper': 'focus',
+        'click @ui.bubble': 'toggle'
     },
 
     modelEvents: {
@@ -18,6 +19,7 @@ module.exports = Marionette.LayoutView.extend({
     },
 
     ui: {
+        bubble: '#sk-bubble-overlay',
         wrapper: '#sk-wrapper'
     },
 
@@ -27,6 +29,10 @@ module.exports = Marionette.LayoutView.extend({
         settings: '[data-region-settings]',
         main: '[data-region-main]',
         footer: '[data-region-footer]'
+    },
+
+    initialize: function() {
+        this.toggle = this.toggle.bind(this);
     },
 
     open: function() {

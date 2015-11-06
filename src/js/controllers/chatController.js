@@ -24,7 +24,8 @@ module.exports = ViewController.extend({
     viewClass: ChatView,
 
     viewEvents: {
-        focus: 'resetUnread'
+        focus: 'resetUnread',
+        toggle: 'toggle'
     },
 
     initialize: function() {
