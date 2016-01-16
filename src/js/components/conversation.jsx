@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 
 import { createMarkup } from 'utils/html';
 
-import { MessageComponent } from 'components/message.jsx';
+import { MessageComponent } from 'components/message';
+import { CardComponent } from 'components/card';
 
 export class ConversationComponent extends Component {
     constructor(...args) {
@@ -49,7 +50,15 @@ export class ConversationComponent extends Component {
     }
 
     render() {
-        const messages = this.props.conversation.messages.map((message) => <MessageComponent key={ message._id } {...message} />);
+        const messages = this.props.conversation.messages.map((message) => {
+            if (message.metadata && message.metadata.type && message.metadata.type.startsWith('card.')) {
+
+                return <CardComponent key={ message._id } {...message.metadata} />;
+            } else {
+                return <MessageComponent key={ message._id } {...message} />;
+            }
+        }
+        );
 
         return (
             <div id="sk-conversation" ref="container">

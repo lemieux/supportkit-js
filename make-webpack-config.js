@@ -76,6 +76,7 @@ module.exports = function(options) {
     ];
 
     var plugins = [
+        new webpack.IgnorePlugin(/^\.\/locale$/, [/moment$/]),
         new webpack.DefinePlugin({
             VERSION: JSON.stringify(VERSION)
         }),

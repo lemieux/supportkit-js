@@ -35,6 +35,8 @@
     "deep-equal": "^1.0.1",
     "faye": "^1.1.2",
     "lodash.pick": "^3.1.0",
+    "material-ui": "^0.14.2",
+    "moment": "^2.11.1",
     "react": "^0.14.2",
     "react-addons-css-transition-group": "^0.14.3",
     "react-dom": "^0.14.2",
