@@ -58,7 +58,7 @@ export class ConversationComponent extends Component {
         const messages = this.props.conversation.messages.map((message) => <MessageComponent key={ message._id } {...message} />);
 
         return (
-            <div id="sk-conversation" ref="container" style={ this.props.style }>
+            <div ref="container" style={ this.props.style }>
                 <div ref="intro" className="sk-intro" dangerouslySetInnerHTML={ createMarkup(this.props.ui.text.introText) }></div>
                 <div ref="messages">
                     { messages }

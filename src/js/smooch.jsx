@@ -22,6 +22,10 @@ import { Observable, observeStore } from 'utils/events';
 import { storage } from 'utils/storage';
 import { waitForPage } from 'utils/dom';
 
+import injectTapEventPlugin from 'react-tap-event-plugin';
+
+injectTapEventPlugin();
+
 function renderWidget() {
     const el = document.createElement('div');
     el.setAttribute('id', 'sk-holder');

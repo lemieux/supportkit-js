@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Widget } from 'components/widget.jsx';
+import { Widget } from 'components/material-ui/widget.jsx';
 import { Provider } from 'react-redux';
 
 export class Root extends Component {

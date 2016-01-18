@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Widget } from 'components/widget.jsx';
+import { Widget } from 'components/material-ui/widget.jsx';
 import { store } from 'stores/app-store';
 import { Provider } from 'react-redux';
 import { DevTools } from 'components/dev-tools';
