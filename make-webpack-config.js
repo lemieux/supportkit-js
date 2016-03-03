@@ -11,8 +11,13 @@ module.exports = function(options) {
     var LICENSE = fs.readFileSync('LICENSE', 'utf8');
 
     var entry = {
-        smooch: ['./src/js/utils/polyfills', './src/js/main']
+        smooch: options.hotComponents ?
+            ['webpack/hot/dev-server', './src/js/utils/polyfills', './src/js/main'] :
+            ['./src/js/utils/polyfills', './src/js/main'],
+        sw: ['./src/js/serviceWorker']
     };
+
+
 
     var loaders = {
         'jsx': options.hotComponents ? ['react-hot-loader', 'babel-loader'] : 'babel-loader',
@@ -111,6 +116,7 @@ module.exports = function(options) {
             stylesheetLoaders[ext] = 'style-loader!' + stylesheetLoader;
         }
     });
+
     if (options.separateStylesheet) {
         plugins.push(new ExtractTextPlugin('[name].css' + (options.longTermCaching ? '?[contenthash]' : '')));
     }
@@ -127,7 +133,8 @@ module.exports = function(options) {
             new webpack.DefinePlugin({
                 'process.env': {
                     NODE_ENV: JSON.stringify('production')
-                }
+                },
+                'SERVICE_WORKER_URL': 'https://cdn.smooch.io/smooch.sw.min.js'
             }),
             new webpack.NoErrorsPlugin(),
 
@@ -149,6 +156,9 @@ module.exports = function(options) {
                 'process.env': {
                     NODE_ENV: JSON.stringify('development')
                 }
+            }),
+            new webpack.DefinePlugin({
+                'SERVICE_WORKER_URL': `${publicPath}sw.js`
             })
         );
     }
